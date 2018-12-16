@@ -17,7 +17,7 @@ public class Equipos {
     public Equipos(){
         
         try{
-            eq=new RandomAccessFile("data\\Equipos.lig","rw");
+            eq=new RandomAccessFile("Equipos.lig","rw");
         }catch(Exception e){
             System.out.println("Error: "+e.getMessage());
         }
@@ -33,7 +33,7 @@ public class Equipos {
             eq.readUTF();
             eq.readInt();
         }
-        eq.writeInt(code);
+        eq.writeInt(code+1);
     }
     
     public void agregarEquipo(String nombre, String ciudad, int capacidad) throws IOException{
@@ -116,18 +116,24 @@ public class Equipos {
         }
     }
     
-    public void imprimirEquipos() throws IOException{
+    public void imprimirEquipo(int codigo, boolean soloNombre) throws IOException{
         eq.seek(0);
-        System.out.println("Codigo\tNombre\n");
         while(eq.getFilePointer()!=eq.length()){
-            if(eq.readInt()==0){
-                eq.readUTF();
-                eq.readUTF();
-                eq.readInt();
-            }else{
+            if(eq.readInt()==codigo){
                 eq.seek(eq.getFilePointer()-4);
+                if(!soloNombre){
+                    System.out.println(eq.readInt()+"\t"+eq.readUTF()+"\t"+eq.readUTF()+"\t"+eq.readInt());
+                    continue;
+                }
+                else{
+                    eq.readInt();
+                    System.out.println(eq.readUTF());
+                    eq.readUTF();
+                    eq.readInt();
+                    continue;
+                }
             }
-            System.out.println(eq.readInt()+"\t"+eq.readUTF());
+            eq.readUTF();
             eq.readUTF();
             eq.readInt();
         }
@@ -143,5 +149,30 @@ public class Equipos {
         }
         return false;
         
+    }
+    public int cantidadEquipos() throws IOException{
+        eq.seek(0);
+        int cantidad=0;
+        while(eq.getFilePointer()!=eq.length()){
+            cantidad=eq.readInt();
+            eq.readUTF();
+            eq.readUTF();
+            eq.readInt();
+        }
+        return cantidad;
+    }
+    public int capacidadEquipo(int codigo) throws IOException{
+        eq.seek(0);
+        while(eq.getFilePointer()!=eq.length()){
+            if(eq.readInt()==codigo){
+                eq.readUTF();
+                eq.readUTF();
+                return eq.readInt();
+            }
+            eq.readUTF();
+            eq.readUTF();
+            eq.readInt();
+        }
+        return 0;
     }
 }
