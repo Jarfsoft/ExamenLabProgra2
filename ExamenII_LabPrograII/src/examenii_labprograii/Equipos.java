@@ -28,10 +28,11 @@ public class Equipos {
         eq.seek(0);
         int code=0;
         while(eq.getFilePointer()!=eq.length()){
-            code=eq.readInt();
+            eq.readInt();
             eq.readUTF();
             eq.readUTF();
             eq.readInt();
+            code++;
         }
         eq.writeInt(code+1);
     }
@@ -59,8 +60,8 @@ public class Equipos {
             return;
         }
         eq.writeInt(0);
-        eq.writeUTF("");
-        eq.writeUTF("");
+        eq.writeUTF("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+        eq.writeUTF("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
         eq.writeInt(0);
         //Falta eliminar jugadores
     }
@@ -83,6 +84,7 @@ public class Equipos {
             return;
         }
         int op=0;
+        int cant;
         while(op!=4){
             eq.seek(pos);
             System.out.print("\n\nQue desea modificar?\n\n1.Nombre\n2.Ciudad\n3Capacidad\n4.Salir\n\nSeleccion: ");
@@ -91,12 +93,20 @@ public class Equipos {
                 case 1:
                     System.out.print("\n\nNuevo nombre: ");
                     String nombre=leer.next();
+                    cant=nombre.length();
+                    for(int x=0;x<50-cant;x++){
+                        nombre=nombre.concat("&");
+                    }
                     eq.writeUTF(nombre);
                     System.out.print("\n\nModificacion exitosa.");
                     break;
                 case 2:
                     System.out.print("Nueva ciudad: ");
                     String ciudad=leer.next();
+                    cant=ciudad.length();
+                    for(int x=0;x<50-cant;x++){
+                        ciudad=ciudad.concat("&");
+                    }
                     eq.readUTF();
                     eq.writeUTF(ciudad);
                     System.out.print("\n\nModificacion exitosa.");
@@ -118,23 +128,24 @@ public class Equipos {
     
     public void imprimirEquipo(int codigo, boolean soloNombre) throws IOException{
         eq.seek(0);
+        int cod;
+        String nomb;
+        String ciud;
         while(eq.getFilePointer()!=eq.length()){
-            if(eq.readInt()==codigo){
-                eq.seek(eq.getFilePointer()-4);
+            cod=eq.readInt();
+            nomb=eq.readUTF().split("&")[0];
+            ciud=eq.readUTF().split("&")[0];
+            if(cod==codigo){
                 if(!soloNombre){
-                    System.out.println(eq.readInt()+"\t"+eq.readUTF()+"\t"+eq.readUTF()+"\t"+eq.readInt());
-                    continue;
+                    System.out.println(cod+"\t\t"+nomb+"\t\t"+ciud+"\t\t"+eq.readInt());
+                    return;
                 }
                 else{
+                    System.out.println(nomb);
                     eq.readInt();
-                    System.out.println(eq.readUTF());
-                    eq.readUTF();
-                    eq.readInt();
-                    continue;
+                    return;
                 }
             }
-            eq.readUTF();
-            eq.readUTF();
             eq.readInt();
         }
     }
@@ -154,7 +165,8 @@ public class Equipos {
         eq.seek(0);
         int cantidad=0;
         while(eq.getFilePointer()!=eq.length()){
-            cantidad=eq.readInt();
+            eq.readInt();
+            cantidad++;
             eq.readUTF();
             eq.readUTF();
             eq.readInt();
@@ -169,6 +181,21 @@ public class Equipos {
                 eq.readUTF();
                 return eq.readInt();
             }
+            eq.readUTF();
+            eq.readUTF();
+            eq.readInt();
+        }
+        return 0;
+    }
+    public int codigoPosicion(int pos) throws IOException{
+        int act=0;
+        eq.seek(0);
+        while(eq.getFilePointer()!=eq.length()){
+            act++;
+            if(act==pos)
+                return eq.readInt();
+            else
+                eq.readInt();
             eq.readUTF();
             eq.readUTF();
             eq.readInt();

@@ -24,13 +24,30 @@ public class Jugadores {
     }
     
     public void agregarJugador(int codigoEquipo,String nombre, int dorsal, String posicion, int edad, String nacionalidad) throws IOException{
-        jd.seek(jd.length());
+        jd.seek(0);
+        while(jd.getFilePointer()!=jd.length()){
+            if(codigoEquipo==jd.readInt()){
+                jd.readUTF();
+                if(dorsal==jd.readInt()){
+                    System.out.println("\n\nNumero en uso por alguien del equipo.");
+                    return;
+                }
+                
+            }else{
+                jd.readUTF();
+                jd.readInt();
+            }
+            jd.readUTF();
+            jd.readInt();
+            jd.readUTF();
+        }
         jd.writeInt(codigoEquipo);
         jd.writeUTF(nombre);
         jd.writeInt(dorsal);
         jd.writeUTF(posicion);
         jd.writeInt(edad);
         jd.writeUTF(nacionalidad);
+        System.out.println("\n\nJugador Agregado con exito.");
     }
     public void eliminarEquipoJugadores(int codigo) throws IOException{
         jd.seek(0);
@@ -38,10 +55,14 @@ public class Jugadores {
             if(jd.readInt()==codigo){
                 jd.seek(jd.getFilePointer()-4);
                 jd.writeInt(0);
-                jd.writeUTF("");
+                jd.writeUTF("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
                 jd.writeInt(0);
-                jd.writeUTF("");
+                jd.writeUTF("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+                jd.writeInt(0);
+                jd.writeUTF("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
             }else{
+                jd.readUTF();
+                jd.readInt();
                 jd.readUTF();
                 jd.readInt();
                 jd.readUTF();
@@ -80,18 +101,23 @@ public class Jugadores {
     public void imprimirJugador(int pos, boolean dorsal)throws IOException{
         long posi=jd.getFilePointer();
         int act=0;
+        String nomb;
         jd.seek(0);
         do{
             act++;
             jd.readInt();
+            nomb=jd.readUTF().split("&")[0];
+            
             if(pos==act){
                 if(dorsal)
-                    System.out.println(jd.readUTF()+"\t"+jd.readInt());
+                    System.out.println(nomb+"\t\t"+jd.readInt());
                 else{
-                    System.out.println(jd.readUTF());
+                    System.out.println(nomb);
                     jd.readInt();
                 }
                 
+            }else{
+                jd.readInt();
             }
             jd.readUTF();
             jd.readInt();
@@ -112,11 +138,11 @@ public class Jugadores {
             jugadores[x][1]=jd.readInt();
             jd.readUTF();
         }
-        int temp=0;
-        int temp1=0;
+        int temp;
+        int temp1;
         for(int i=0;i<jugadores.length;i++){
             for(int j=1;j<jugadores.length-i;j++){
-                if(jugadores[j-1][1]>jugadores[j][1]){
+                if(jugadores[j-1][1]<jugadores[j][1]){
                     temp=jugadores[j-1][0];
                     temp1=jugadores[j-1][1];
                     jugadores[j-1][0]=jugadores[j][0];
@@ -146,7 +172,8 @@ public class Jugadores {
     }
     public void imprimirJugadoresPosicion(String posicion) throws IOException{
         jd.seek(0);
-        long loc=0;
+        long loc;
+        String nomb;
         while(jd.getFilePointer()!=jd.length()){
             loc=jd.getFilePointer();
             jd.readInt();
@@ -155,7 +182,8 @@ public class Jugadores {
             if(jd.readUTF().equals(posicion)){
                 jd.seek(loc);
                 jd.readInt();
-                System.out.println(jd.readUTF());
+                nomb=jd.readUTF().split("&")[0];
+                System.out.println(nomb);
                 jd.readInt();
                 jd.readUTF();
             }
@@ -163,3 +191,4 @@ public class Jugadores {
             jd.readUTF();
         }
     }
+}
